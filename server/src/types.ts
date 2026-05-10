@@ -1,8 +1,8 @@
 /**
- * Wire format for messages flowing through GSOC into the clawpipes server.
+ * Wire format for messages flowing through GSOC into the pipeo server.
  *
  * Extends PipeOrgan's base PipeMessage with three signing fields:
- *  - ensName        : sender's ENS name (e.g. alice.clawpipes.eth)
+ *  - ensName        : sender's ENS name (e.g. alice.pipeo.eth)
  *  - senderAddress  : the Ethereum address that ENS resolves to
  *  - signature      : 65-byte (0x-prefixed hex) ECDSA signature over the
  *                     canonical JSON of all OTHER fields. We recover the
@@ -23,7 +23,7 @@ export type SignedPipeMessage = {
   timestamp: number;
   parentId: string;
 
-  // ClawPipes signing fields
+  // Pipeo signing fields
   ensName: string;
   senderAddress: string; // 0x-prefixed, lowercased
   signature: string;     // 0x-prefixed

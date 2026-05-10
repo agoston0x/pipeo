@@ -9,7 +9,7 @@ import { signMessage } from "./sign.js";
 const PORT = Number(process.env.PORT ?? 4071);
 const SWARM_URL = process.env.SWARM_URL ?? "http://localhost:1633";
 const POSTAGE_BATCH_ID_RAW = process.env.POSTAGE_BATCH_ID ?? "";
-const GSOC_CHANNEL_NAME = process.env.GSOC_CHANNEL_NAME ?? "clawpipes-mainnet";
+const GSOC_CHANNEL_NAME = process.env.GSOC_CHANNEL_NAME ?? "pipeo-mainnet";
 const GSOC_SIGNER_PRIVATE_KEY = process.env.GSOC_SIGNER_PRIVATE_KEY ?? "";
 const AGENT_ENS_NAME = process.env.AGENT_ENS_NAME ?? "";
 const AGENT_PRIVATE_KEY = (process.env.AGENT_PRIVATE_KEY ?? "") as Hex;

@@ -1,11 +1,11 @@
 /**
- * Live data layer — calls the clawpipes server's REST API.
+ * Live data layer — calls the pipeo server's REST API.
  *
- * Server URL via CLAWPIPES_API_URL env (default http://localhost:4070).
+ * Server URL via PIPEO_API_URL env (default http://localhost:4070).
  * All reads are uncached so the UI always shows the freshest GSOC-derived state.
  */
 
-const API = process.env.CLAWPIPES_API_URL ?? "http://localhost:4070";
+const API = process.env.PIPEO_API_URL ?? "http://localhost:4070";
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(API + path, { cache: "no-store" });

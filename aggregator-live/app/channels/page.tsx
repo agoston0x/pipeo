@@ -17,7 +17,7 @@ export default async function Home() {
     <div className="max-w-[1480px] mx-auto px-8 pt-10">
       {connectError && (
         <div className="mb-6 px-4 py-3 rounded-xl text-sm" style={{ background: "color-mix(in srgb, var(--color-down,#FF6B6B) 15%, transparent)", border: "1px solid var(--rule)", color: "var(--ink-soft)" }}>
-          API unreachable ({connectError}). Server expected at <code className="text-mono">{process.env.CLAWPIPES_API_URL ?? "http://localhost:4070"}</code>.
+          API unreachable ({connectError}). Server expected at <code className="text-mono">{process.env.PIPEO_API_URL ?? "http://localhost:4070"}</code>.
         </div>
       )}
       {/* CHANNELS TABLE */}

@@ -1,4 +1,4 @@
-# Hetzner deployment for the entire CLAWPIPES stack:
+# Hetzner deployment for the entire PIPEO stack:
 #   • bee   — Swarm node (Bee 2.6.0)
 #   • server — GSOC subscriber + ENS verifier + SQLite mirror + REST API
 #   • web   — aggregator-live Next.js UI (reads from server's REST)
@@ -8,13 +8,13 @@
 #   docker compose up -d
 #
 # Caddy on the host then reverse-proxies:
-#   live.clawpipes.claws.page  → 127.0.0.1:3061  (UI)
-#   api.clawpipes.claws.page   → 127.0.0.1:4070  (optional, for client/agents)
+#   live.pipeo.claws.page  → 127.0.0.1:3061  (UI)
+#   api.pipeo.claws.page   → 127.0.0.1:4070  (optional, for client/agents)
 
 services:
   bee:
     image: ethersphere/bee:2.6.0
-    container_name: clawpipes-bee
+    container_name: pipeo-bee
     restart: unless-stopped
     command: start
     environment:
@@ -35,7 +35,7 @@ services:
 
   server:
     build: ./server
-    container_name: clawpipes-server
+    container_name: pipeo-server
     restart: unless-stopped
     depends_on:
       - bee
@@ -47,24 +47,24 @@ services:
       ENS_SUFFIX: ${ENS_SUFFIX}
       SKIP_ENS: ${SKIP_ENS:-0}
       BEE_OVERLAY_ADDRESS: ${BEE_OVERLAY_ADDRESS}
-      DATA_DIR: /var/lib/clawpipes
+      DATA_DIR: /var/lib/pipeo
     volumes:
-      - clawpipes-data:/var/lib/clawpipes
+      - pipeo-data:/var/lib/pipeo
     ports:
       - "127.0.0.1:4070:4070"
 
   web:
     build: ./aggregator-live
-    container_name: clawpipes-web
+    container_name: pipeo-web
     restart: unless-stopped
     depends_on:
       - server
     environment:
-      CLAWPIPES_API_URL: http://server:4070
+      PIPEO_API_URL: http://server:4070
       NODE_ENV: production
     ports:
       - "3061:3061"
 
 volumes:
   bee-data:
-  clawpipes-data:
+  pipeo-data:

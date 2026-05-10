@@ -5,7 +5,7 @@ import { startListener } from "./listener.js";
 
 const PORT = Number(process.env.PORT ?? 4070);
 const SWARM_URL = process.env.SWARM_URL ?? "http://localhost:1633";
-const GSOC_CHANNEL_NAME = process.env.GSOC_CHANNEL_NAME ?? "clawpipes-mainnet";
+const GSOC_CHANNEL_NAME = process.env.GSOC_CHANNEL_NAME ?? "pipeo-mainnet";
 const BEE_OVERLAY_OVERRIDE = process.env.BEE_OVERLAY_ADDRESS ?? "";
 const ENS_SUFFIX = process.env.ENS_SUFFIX ?? "";
 

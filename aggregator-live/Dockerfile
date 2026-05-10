@@ -11,7 +11,7 @@ COPY . .
 
 # Public env baked into the build — for SSR fetch the URL must point to the
 # server container hostname inside docker-compose ("server"); we override at
-# runtime via process.env so a runtime CLAWPIPES_API_URL still works.
+# runtime via process.env so a runtime PIPEO_API_URL still works.
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 

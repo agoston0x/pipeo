@@ -1,9 +1,9 @@
 #!/bin/bash
-# Sync the clawpipes/ tree to Hetzner CLAWS host.
+# Sync the pipeo/ tree to Hetzner CLAWS host.
 set -e
 
-SRC="/Users/mac/Code/Prague/clawpipes/"
-DEST="hetzner-claws:/home/ubuntu/clawpipes/"
+SRC="$(cd "$(dirname "$0")" && pwd)/"
+DEST="hetzner-claws:/home/ubuntu/pipeo/"
 
 rsync -avz \
   --exclude=node_modules \
@@ -17,5 +17,5 @@ rsync -avz \
 echo
 echo "Synced. Next:"
 echo "  ssh hetzner-claws"
-echo "  cd /home/ubuntu/clawpipes"
+echo "  cd /home/ubuntu/pipeo"
 echo "  docker compose up -d --build"

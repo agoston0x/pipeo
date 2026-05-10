@@ -19,7 +19,7 @@ export function TopNav() {
       <div className="h-full max-w-[1480px] mx-auto px-8 flex items-center gap-12">
         <Link href="/" className="flex items-center gap-2.5 text-display text-[15px] font-semibold tracking-[0.04em] leading-none">
           <Logo />
-          <span>CLAWPIPES</span>
+          <span>PIPEO</span>
         </Link>
         <nav className="flex items-center gap-7">
           {NAV.map((n) => {

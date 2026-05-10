@@ -16,10 +16,10 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV PORT=4070
-ENV DATA_DIR=/var/lib/clawpipes
-RUN mkdir -p /var/lib/clawpipes
+ENV DATA_DIR=/var/lib/pipeo
+RUN mkdir -p /var/lib/pipeo
 
-VOLUME ["/var/lib/clawpipes"]
+VOLUME ["/var/lib/pipeo"]
 EXPOSE 4070
 
 CMD ["pnpm", "start"]

@@ -1,6 +1,6 @@
 /**
  * Wire format mirrored from the server. Keep in sync with
- * `clawpipes/server/src/types.ts`.
+ * `pipeo/server/src/types.ts`.
  */
 
 export type SignedPipeMessage = {

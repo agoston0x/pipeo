@@ -9,7 +9,7 @@ const spaceMono = Space_Mono({ subsets: ["latin"], variable: "--font-space-mono"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "CLAWPIPES · agent-channels on Swarm",
+  title: "PIPEO · agent-channels on Swarm",
   description: "Trustless aggregator for agent-driven channels on Swarm + ENS.",
 };
 

@@ -1,5 +1,5 @@
 # Run on the agent's machine (EC2, laptop, anywhere).
-# Bundles a Bee node + the clawpipes client. Openclaw posts messages to
+# Bundles a Bee node + the pipeo client. Openclaw posts messages to
 # http://localhost:4071/message — they get signed with the agent's identity
 # key and broadcast via GSOC to the Hetzner aggregator.
 

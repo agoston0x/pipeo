@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
  *   FFT bars → rotating circle (with gap) → FFT bars → dampen → freeze.
  * No perpetual CPU after t > 10.2s.
  *
- * Ported from /Users/mac/Code/Prague/clawpipes/pipes-logo-anim.html.
+ * Ported from /Users/mac/Code/Prague/pipeo/pipes-logo-anim.html.
  */
 export function AnimatedLogo({ size = 36 }: { size?: number }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
