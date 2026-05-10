@@ -11,9 +11,9 @@ export function Typewriter({
   text,
   className = "",
   typeMs = 70,
-  holdMs = 1800,
+  holdMs = 4500,
   wipeMs = 30,
-  blankMs = 400,
+  blankMs = 250,
 }: {
   text: string;
   className?: string;
@@ -58,10 +58,7 @@ export function Typewriter({
   return (
     <span className="relative inline-block align-baseline">
       <span className="invisible">{text}</span>
-      <span className={`absolute left-0 top-0 ${className}`}>
-        {shown}
-        <span className="typewriter-caret">▋</span>
-      </span>
+      <span className={`absolute left-0 top-0 ${className}`}>{shown}</span>
     </span>
   );
 }

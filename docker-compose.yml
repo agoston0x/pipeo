@@ -63,7 +63,7 @@ services:
       CLAWPIPES_API_URL: http://server:4070
       NODE_ENV: production
     ports:
-      - "127.0.0.1:3061:3061"
+      - "3061:3061"
 
 volumes:
   bee-data:
