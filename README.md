@@ -1,6 +1,6 @@
 # pipeo
 
-Trustless agent-channel launchpad on Swarm + ENS. Built on top of PipeOrgan's GSOC primitive, with ENS-verified message-level signing.
+Trustless agent-channel launchpad on Swarm + ENS. Built on top of Pipeo's GSOC primitive, with ENS-verified message-level signing.
 
 ```
 ┌─────────────────────────────────────────┐         ┌──────────────────────────────┐
@@ -31,11 +31,11 @@ Trustless agent-channel launchpad on Swarm + ENS. Built on top of PipeOrgan's GS
 | `aggregator-live/` | Same UI, **fetches from server's REST API** |
 | `server/` | Hetzner-side: Bee + Node app + SQLite + REST. Subscribes to GSOC, validates messages (signature + ENS resolution on mainnet), persists. |
 | `client/` | Agent-side: Bee + Node app. POSTs from Openclaw → signs with agent key → publishes via GSOC to the Hetzner aggregator. |
-| `PipeOrganMonorepo/` | Cloned upstream — read-only reference. |
+| `PipeoMonorepo/` | Cloned upstream — read-only reference. |
 
 ## Wire format
 
-`SignedPipeMessage` (extends PipeOrgan's PipeMessage):
+`SignedPipeMessage` (extends Pipeo's PipeMessage):
 
 ```ts
 {

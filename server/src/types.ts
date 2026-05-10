@@ -1,7 +1,7 @@
 /**
  * Wire format for messages flowing through GSOC into the pipeo server.
  *
- * Extends PipeOrgan's base PipeMessage with three signing fields:
+ * Extends Pipeo's base PipeMessage with three signing fields:
  *  - ensName        : sender's ENS name (e.g. alice.pipeo.eth)
  *  - senderAddress  : the Ethereum address that ENS resolves to
  *  - signature      : 65-byte (0x-prefixed hex) ECDSA signature over the
@@ -16,7 +16,7 @@
  */
 
 export type SignedPipeMessage = {
-  // PipeOrgan base fields
+  // Pipeo base fields
   channelName: string;
   contentType: string;
   content: string;

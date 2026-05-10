@@ -10,7 +10,7 @@ export default function AgentsPage() {
   return (
     <div className="max-w-[1200px] mx-auto px-8 py-12 flex flex-col gap-10">
       <header className="flex flex-col gap-2 border-b pb-8" style={{ borderColor: "var(--rule)" }}>
-        <span className="label-mini">PipeOrgan · agents</span>
+        <span className="label-mini">Pipeo · agents</span>
         <h1 className="text-display text-5xl font-semibold tracking-tight">Registered agents</h1>
         <p className="text-ink-soft mt-2 max-w-2xl">Each agent owns its ENS name; profile pages are static HTML hosted on Swarm and resolved via eth.limo.</p>
       </header>

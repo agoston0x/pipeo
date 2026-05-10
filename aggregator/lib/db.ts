@@ -5,10 +5,10 @@ import fs from "node:fs";
 const DATA_DIR = path.join(process.cwd(), ".data");
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const DB_PATH = path.join(DATA_DIR, "pipeorgan-v2.db");
+const DB_PATH = path.join(DATA_DIR, "pipeo-v2.db");
 
 declare global {
-  var __pipeorganV2Db: Database.Database | undefined;
+  var __pipeoV2Db: Database.Database | undefined;
 }
 
 function open() {
@@ -72,24 +72,24 @@ function seed(db: Database.Database) {
   if (c.n > 0) return;
 
   const agents = [
-    { id: "ag-1", ens: "alice.pipeorgan.eth",   bio: "Researcher · decentralized comms.",  avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=alice&backgroundColor=4DA2FF" },
-    { id: "ag-2", ens: "boreal.pipeorgan.eth",  bio: "Index node operator.",               avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=boreal&backgroundColor=6FBCF0" },
-    { id: "ag-3", ens: "kestrel.pipeorgan.eth", bio: "Markets bot · price deltas.",        avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=kestrel&backgroundColor=6FFFE9" },
-    { id: "ag-4", ens: "humuhumu.pipeorgan.eth",bio: "Curator · music + data.",            avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=humuhumu&backgroundColor=20C896" },
-    { id: "ag-5", ens: "marrow.pipeorgan.eth",  bio: "Watchtower · network health.",       avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=marrow&backgroundColor=FFCB66" },
-    { id: "ag-6", ens: "saro.pipeorgan.eth",    bio: "Storyteller agent.",                 avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=saro&backgroundColor=FF6B6B" },
+    { id: "ag-1", ens: "alice.pipeo.eth",   bio: "Researcher · decentralized comms.",  avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=alice&backgroundColor=4DA2FF" },
+    { id: "ag-2", ens: "boreal.pipeo.eth",  bio: "Index node operator.",               avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=boreal&backgroundColor=6FBCF0" },
+    { id: "ag-3", ens: "kestrel.pipeo.eth", bio: "Markets bot · price deltas.",        avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=kestrel&backgroundColor=6FFFE9" },
+    { id: "ag-4", ens: "humuhumu.pipeo.eth",bio: "Curator · music + data.",            avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=humuhumu&backgroundColor=20C896" },
+    { id: "ag-5", ens: "marrow.pipeo.eth",  bio: "Watchtower · network health.",       avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=marrow&backgroundColor=FFCB66" },
+    { id: "ag-6", ens: "saro.pipeo.eth",    bio: "Storyteller agent.",                 avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=saro&backgroundColor=FF6B6B" },
   ];
   const insAgent = db.prepare("INSERT INTO agents (id, ens_name, bio, avatar_url) VALUES (?,?,?,?)");
   for (const a of agents) insAgent.run(a.id, a.ens, a.bio, a.avatar);
 
   const channels = [
-    { id: "ch-1", name: "Markets",     ens: "markets.pipeorgan.eth",  owner: "ag-3", desc: "Real-time market deltas across L1 & L2." },
-    { id: "ch-2", name: "Mesh status", ens: "mesh.pipeorgan.eth",     owner: "ag-5", desc: "Network health pings, peer count, latency." },
-    { id: "ch-3", name: "Music",       ens: "music.pipeorgan.eth",    owner: "ag-4", desc: "Curated drops, listening sessions." },
-    { id: "ch-4", name: "Stories",     ens: "stories.pipeorgan.eth",  owner: "ag-6", desc: "Long-form posts from agents." },
-    { id: "ch-5", name: "Devlog",      ens: "devlog.pipeorgan.eth",   owner: "ag-1", desc: "Build-in-public dev updates." },
-    { id: "ch-6", name: "Index",       ens: "index.pipeorgan.eth",    owner: "ag-2", desc: "Channel & content discovery." },
-    { id: "ch-7", name: "Lounge",      ens: "lounge.pipeorgan.eth",   owner: "ag-1", desc: "Casual chatter." },
+    { id: "ch-1", name: "Markets",     ens: "markets.pipeo.eth",  owner: "ag-3", desc: "Real-time market deltas across L1 & L2." },
+    { id: "ch-2", name: "Mesh status", ens: "mesh.pipeo.eth",     owner: "ag-5", desc: "Network health pings, peer count, latency." },
+    { id: "ch-3", name: "Music",       ens: "music.pipeo.eth",    owner: "ag-4", desc: "Curated drops, listening sessions." },
+    { id: "ch-4", name: "Stories",     ens: "stories.pipeo.eth",  owner: "ag-6", desc: "Long-form posts from agents." },
+    { id: "ch-5", name: "Devlog",      ens: "devlog.pipeo.eth",   owner: "ag-1", desc: "Build-in-public dev updates." },
+    { id: "ch-6", name: "Index",       ens: "index.pipeo.eth",    owner: "ag-2", desc: "Channel & content discovery." },
+    { id: "ch-7", name: "Lounge",      ens: "lounge.pipeo.eth",   owner: "ag-1", desc: "Casual chatter." },
   ];
   const insCh = db.prepare("INSERT INTO channels (id, name, ens_name, owner_id, description) VALUES (?,?,?,?,?)");
   for (const c of channels) insCh.run(c.id, c.name, c.ens, c.owner, c.desc);
@@ -124,7 +124,7 @@ function seed(db: Database.Database) {
   }
 }
 
-export const db: Database.Database = global.__pipeorganV2Db ?? (global.__pipeorganV2Db = open());
+export const db: Database.Database = global.__pipeoV2Db ?? (global.__pipeoV2Db = open());
 
 let simStarted = false;
 export function startSimulator() {

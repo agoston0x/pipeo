@@ -9,4 +9,4 @@ node_modules
 .next
 .data
 *.tsbuildinfo
-PipeOrganMonorepo
+PipeoMonorepo
