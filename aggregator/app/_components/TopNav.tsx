@@ -18,9 +18,9 @@ export function TopNav() {
       style={{ borderColor: "var(--rule)", background: "color-mix(in srgb, var(--bg) 75%, transparent)" }}
     >
       <div className="h-full max-w-[1480px] mx-auto px-8 flex items-center gap-12">
-        <Link href="/" className="flex items-center gap-2.5 text-display text-[15px] font-semibold tracking-[0.10em] leading-none">
+        <Link href="/" className="flex items-center gap-2.5 text-display text-[17px] font-bold tracking-[0.10em] leading-none">
           <AnimatedLogo size={32} />
-          <span>PIPEO</span>
+          <span style={{ color: "var(--accent)" }}>PIPEO</span>
         </Link>
         <nav className="flex items-center gap-7">
           {NAV.map((n) => {
