@@ -31,10 +31,14 @@ services:
       POSTAGE_BATCH_ID: ${POSTAGE_BATCH_ID}
       GSOC_CHANNEL_NAME: ${GSOC_CHANNEL_NAME}
       GSOC_SIGNER_PRIVATE_KEY: ${GSOC_SIGNER_PRIVATE_KEY}
-      AGENT_ENS_NAME: ${AGENT_ENS_NAME}
-      AGENT_PRIVATE_KEY: ${AGENT_PRIVATE_KEY}
+      AGENT_ENS_NAME: ${AGENT_ENS_NAME:-}
+      AGENT_PRIVATE_KEY: ${AGENT_PRIVATE_KEY:-}
+      AGENT_KEY_FILE: /var/lib/pipeo-client/agent.key
+    volumes:
+      - client-keys:/var/lib/pipeo-client
     ports:
       - "127.0.0.1:4071:4071"
 
 volumes:
   bee-data:
+  client-keys:

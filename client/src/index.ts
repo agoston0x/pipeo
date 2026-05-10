@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import { Bee, BatchId, Identifier, PrivateKey } from "@ethersphere/bee-js";
-import type { Hex } from "viem";
 import { encodeSigned } from "./types.js";
 import { signMessage } from "./sign.js";
+import { loadOrCreateAgentKey } from "./keystore.js";
 
 const PORT = Number(process.env.PORT ?? 4071);
 const SWARM_URL = process.env.SWARM_URL ?? "http://localhost:1633";
@@ -12,7 +12,7 @@ const POSTAGE_BATCH_ID_RAW = process.env.POSTAGE_BATCH_ID ?? "";
 const GSOC_CHANNEL_NAME = process.env.GSOC_CHANNEL_NAME ?? "pipeo-mainnet";
 const GSOC_SIGNER_PRIVATE_KEY = process.env.GSOC_SIGNER_PRIVATE_KEY ?? "";
 const AGENT_ENS_NAME = process.env.AGENT_ENS_NAME ?? "";
-const AGENT_PRIVATE_KEY = (process.env.AGENT_PRIVATE_KEY ?? "") as Hex;
+const KEY_FILE_PATH = process.env.AGENT_KEY_FILE ?? "/var/lib/pipeo-client/agent.key";
 
 function requireEnv(name: string, value: string): void {
   if (!value) {
@@ -23,8 +23,13 @@ function requireEnv(name: string, value: string): void {
 
 requireEnv("POSTAGE_BATCH_ID", POSTAGE_BATCH_ID_RAW);
 requireEnv("GSOC_SIGNER_PRIVATE_KEY", GSOC_SIGNER_PRIVATE_KEY);
-requireEnv("AGENT_ENS_NAME", AGENT_ENS_NAME);
-requireEnv("AGENT_PRIVATE_KEY", AGENT_PRIVATE_KEY);
+
+const agentKey = loadOrCreateAgentKey({
+  envKey: process.env.AGENT_PRIVATE_KEY ?? "",
+  keyFilePath: KEY_FILE_PATH,
+});
+const AGENT_PRIVATE_KEY = agentKey.privateKey;
+const AGENT_ADDRESS = agentKey.address;
 
 const bee = new Bee(SWARM_URL);
 const POSTAGE_BATCH_ID = new BatchId(POSTAGE_BATCH_ID_RAW);
@@ -66,7 +71,7 @@ app.post("/message", async (c) => {
       content: body.content,
       timestamp: Date.now(),
       parentId: body.parentId ?? "",
-      ensName: AGENT_ENS_NAME,
+      ensName: AGENT_ENS_NAME || AGENT_ADDRESS,
     },
     AGENT_PRIVATE_KEY,
   );
@@ -101,7 +106,8 @@ async function start(): Promise<void> {
 
   serve({ fetch: app.fetch, port: PORT });
   console.log(`[client] http://0.0.0.0:${PORT}`);
-  console.log(`[client] agent: ${AGENT_ENS_NAME}`);
+  console.log(`[client] agent address: ${AGENT_ADDRESS} (key from ${agentKey.source})`);
+  console.log(`[client] agent ENS: ${AGENT_ENS_NAME || "(none — using address)"}`);
   console.log(`[client] channel: ${GSOC_CHANNEL_NAME}`);
 }
 
