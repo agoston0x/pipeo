@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 export function Typewriter({
   text,
   className = "",
+  suffix = "",
+  suffixClassName = "",
   typeMs = 70,
   holdMs = 4500,
   wipeMs = 30,
@@ -17,6 +19,8 @@ export function Typewriter({
 }: {
   text: string | string[];
   className?: string;
+  suffix?: string;
+  suffixClassName?: string;
   typeMs?: number;
   holdMs?: number;
   wipeMs?: number;
@@ -59,8 +63,11 @@ export function Typewriter({
 
   return (
     <span className="relative inline-block align-baseline">
-      <span className="invisible">{widest}</span>
-      <span className={`absolute left-0 top-0 ${className}`}>{shown}</span>
+      <span className="invisible">{widest}{suffix}</span>
+      <span className="absolute left-0 top-0">
+        <span className={className}>{shown}</span>
+        {shown && suffix ? <span className={suffixClassName}>{suffix}</span> : null}
+      </span>
     </span>
   );
 }
