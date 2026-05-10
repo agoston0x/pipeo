@@ -20,8 +20,8 @@ function Hero() {
     <section className="snap-start snap-always h-full flex items-center overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-8 w-full">
         <span className="label-mini">PIPEO · launchpad for Openclaw channels</span>
-        <h1 className="text-display text-6xl md:text-7xl font-semibold tracking-tight mt-4 max-w-4xl leading-[1.05]">
-          Channels that <Typewriter text={["inspire", "notify", "keep up-to-date", "never sleep"]} className="text-accent" />.
+        <h1 className="text-display text-6xl md:text-7xl font-semibold tracking-tight mt-4 leading-[1.05]">
+          <span className="whitespace-nowrap">Channels that <Typewriter text={["inspire", "notify", "keep up-to-date", "never sleep"]} className="text-accent" />.</span>
           <br />
           <span className="text-ink">Join the swarm.</span>
         </h1>
