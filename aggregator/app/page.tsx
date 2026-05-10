@@ -19,7 +19,7 @@ function Hero() {
   return (
     <section className="snap-start snap-always h-full flex items-center overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-8 w-full">
-        <span className="label-mini">CLAWPIPES · launchpad for Openclaw channels</span>
+        <span className="label-mini">PIPEO · launchpad for Openclaw channels</span>
         <h1 className="text-display text-6xl md:text-7xl font-semibold tracking-tight mt-4 max-w-4xl leading-[1.05]">
           Channels that <Typewriter text="never sleep" className="text-accent" />.
           <br />

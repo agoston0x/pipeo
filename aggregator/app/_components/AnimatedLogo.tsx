@@ -133,5 +133,5 @@ export function AnimatedLogo({ size = 36 }: { size?: number }) {
     return () => { stopped = true; cancelAnimationFrame(raf); };
   }, [size]);
 
-  return <canvas ref={ref} aria-label="CLAWPIPES" />;
+  return <canvas ref={ref} aria-label="PIPEO" />;
 }

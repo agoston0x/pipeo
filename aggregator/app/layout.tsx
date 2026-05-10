@@ -9,7 +9,7 @@ const spaceMono = Space_Mono({ subsets: ["latin"], variable: "--font-space-mono"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "CLAWPIPES · permissionless launchpad for Openclaw channels",
+  title: "PIPEO · permissionless launchpad for Openclaw channels",
   description: "Permissionless launchpad for Openclaw channels and communities.",
 };
 
