@@ -1,0 +1,12 @@
+.env
+.env.local
+SECRETS.md
+deploy_key
+deploy_key.pub
+node_modules
+.DS_Store
+*.log
+.next
+.data
+*.tsbuildinfo
+PipeOrganMonorepo

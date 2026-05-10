@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>clawpipes</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #030F1C;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  canvas { display: block; max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+/* Sui brand palette */
+const COL = {
+  bg:        '#030F1C',
+  pipeOuter: '#02080F',
+  pipeShade: '#0c2a52',
+  pipeMain:  '#4DA2FF',
+  pipeHigh:  '#a8d5ff',
+  pipeSpec:  '#ffffff',
+  accent:    '#FE8BC2',
+  endDark:   '#020611',
+  endRing:   '#4DA2FF',
+};
+
+const LETTERS = {
+  C: [[[60,10],[10,10],[10,70],[60,70]]],
+  L: [[[10,10],[10,70],[60,70]]],
+  A: [[[10,70],[19,48],[51,48],[19,48],[35,10],[51,48],[60,70]]],
+  W: [[[10,10],[13,10],[22,77],[35,35],[48,77],[57,10],[60,10]]],
+  P: [[[10,70],[10,10],[50,10],[50,40],[10,40]]],
+  I: [[[30,10],[30,70]]],
+  E: [[[60,10],[10,10],[10,40],[42,40],[10,40],[10,70],[60,70]]],
+  S: [[[60,10],[10,10],[10,40],[60,40],[60,70],[10,70]]]
+};
+
+const WORD = 'CLAWPIPES';
+const LETTER_H = 88;             // accommodates W's deeper valleys
+const STROKE_RADIUS = 9;         // half of outer pipe stroke width
+const KERN = 8;                  // uniform visual gap between letter 
+ink
+const PADDING = 80;
+const CORNER_RADIUS = 14;
+const CORNER_SAMPLES = 14;
+
+/* Per-letter horizontal bounds in raw letter coords */
+const letterBounds = {};
+for (const ch of Object.keys(LETTERS)) {
+  let minX = Infinity, maxX = -Infinity;
+  for (const sub of LETTERS[ch]) for (const pt of sub) {
+    if (pt[0] < minX) minX = pt[0];
+    if (pt[0] > maxX) maxX = pt[0];
+  }
+  letterBounds[ch] = { minX, maxX, visualW: maxX - minX + 2 * 
+STROKE_RADIUS };
+}
+
+/* Cumulative layout: place each letter's visual left edge at running 
+cursor */
+let cursorX = PADDING;
+const letterOffsetsX = WORD.split('').map(ch => {
+  const b = letterBounds[ch];
+  const offsetX = cursorX - (b.minX - STROKE_RADIUS);
+  cursorX += b.visualW + KERN;
+  return offsetX;
+});
+const totalW = cursorX - KERN + PADDING;
+const totalH = LETTER_H + PADDING * 2;
+
+let scale = 1;
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const maxW = Math.min(window.innerWidth - 24, 1400);
+  scale = maxW / totalW;
+  canvas.style.width = (totalW * scale) + 'px';
+  canvas.style.height = (totalH * scale) + 'px';
+  canvas.width = Math.floor(totalW * scale * dpr);
+  canvas.height = Math.floor(totalH * scale * dpr);
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* Replace each interior corner with a sampled quadratic Bezier
+   so straight segments meet through a smooth elbow bend. */
+function roundCorners(points, radius, samples) {
+  if (points.length < 3) return points.slice();
+  const out = [points[0]];
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i-1], curr = points[i], next = points[i+1];
+    const ax = prev.x - curr.x, ay = prev.y - curr.y;
+    const bx = next.x - curr.x, by = next.y - curr.y;
+    const lenA = Math.hypot(ax, ay);
+    const lenB = Math.hypot(bx, by);
+    if (lenA === 0 || lenB === 0) { out.push(curr); continue; }
+
+    // dot of (vec to prev) and (vec to next): +1 = U-turn, -1 = 
+straight line.
+    const dot = (ax*bx + ay*by) / (lenA * lenB);
+    if (dot > 0.95) {
+      // U-turn — keep sharp corner so lineJoin:'round' renders a 
+closed pipe-end.
+      out.push(curr);
+      continue;
+    }
+
+    const r = Math.min(radius, lenA * 0.5, lenB * 0.5);
+    const inPt  = { x: curr.x + (ax/lenA)*r, y: curr.y + (ay/lenA)*r 
+};
+    const outPt = { x: curr.x + (bx/lenB)*r, y: curr.y + (by/lenB)*r 
+};
+    out.push(inPt);
+    for (let s = 1; s <= samples; s++) {
+      const u  = s / samples, om = 1 - u;
+      out.push({
+        x: om*om*inPt.x + 2*om*u*curr.x + u*u*outPt.x,
+        y: om*om*inPt.y + 2*om*u*curr.y + u*u*outPt.y,
+      });
+    }
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+
+const letterPaths = [];
+WORD.split('').forEach((ch, idx) => {
+  const ox = letterOffsetsX[idx];
+  const oy = PADDING;
+  const subpaths = LETTERS[ch].map(pts => {
+    const raw = pts.map(p => ({ x: p[0] + ox, y: p[1] + oy }));
+    const points = roundCorners(raw, CORNER_RADIUS, CORNER_SAMPLES);
+    const segLens = [];
+    let totalLen = 0;
+    for (let i = 1; i < points.length; i++) {
+      const L = Math.hypot(points[i].x - points[i-1].x, points[i].y - 
+points[i-1].y);
+      segLens.push(L); totalLen += L;
+    }
+    return { points, segLens, totalLen };
+  });
+  const totalLen = subpaths.reduce((s, sp) => s + sp.totalLen, 0);
+  letterPaths.push({ subpaths, totalLen });
+});
+
+const DRAW_PER_LETTER = 520;
+const STAGGER         = 360;
+const HOLD            = 2200;
+const FADE_IN         = 600;
+const TOTAL = STAGGER * (WORD.length - 1) + DRAW_PER_LETTER + HOLD + 
+FADE_IN;
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 
+2;
+
+function buildVisible(sp, length) {
+  if (length <= 0) return null;
+  if (length >= sp.totalLen) return { points: sp.points.slice(), 
+complete: true };
+  const out = [sp.points[0]];
+  let acc = 0;
+  for (let i = 0; i < sp.segLens.length; i++) {
+    if (acc + sp.segLens[i] >= length) {
+      const t = (length - acc) / sp.segLens[i];
+      out.push({
+        x: lerp(sp.points[i].x, sp.points[i+1].x, t),
+        y: lerp(sp.points[i].y, sp.points[i+1].y, t),
+      });
+      return { points: out, complete: false };
+    }
+    acc += sp.segLens[i];
+    out.push(sp.points[i+1]);
+  }
+  return { points: out, complete: true };
+}
+
+function strokePoly(pts, color, width) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.stroke();
+}
+
+function drawPipe(visible, isComplete) {
+  const pts = visible.points;
+  if (pts.length < 2) return;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  strokePoly(pts, COL.pipeOuter, 18);
+  strokePoly(pts, COL.pipeShade, 14);
+  strokePoly(pts, COL.pipeMain,  11);
+  strokePoly(pts, COL.pipeHigh,  4);
+  ctx.globalAlpha = 0.9;
+  strokePoly(pts, COL.pipeSpec,  1.4);
+  ctx.globalAlpha = 1;
+}
+
+function drawTip(x, y) {
+  const r = 24;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0,    'rgba(255, 255, 255, 0.95)');
+  g.addColorStop(0.35, 'rgba(77, 162, 255, 0.55)');
+  g.addColorStop(0.75, 'rgba(254, 139, 194, 0.18)');
+  g.addColorStop(1,    'rgba(77, 162, 255, 0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+}
+
+const drops = [];
+function spawnDrop(x, y) {
+  drops.push({
+    x: x + (Math.random() - 0.5) * 4, y: y + 2,
+    vx: (Math.random() - 0.5) * 0.4, vy: 0.6 + Math.random() * 0.4,
+    life: 0, max: 60 + Math.random() * 40,
+    r: 1.2 + Math.random() * 1.4,
+    pink: Math.random() < 0.18,
+  });
+}
+function updateDrops(dt) {
+  for (let i = drops.length - 1; i >= 0; i--) {
+    const d = drops[i];
+    d.vy += 0.05 * dt;
+    d.x += d.vx * dt; d.y += d.vy * dt;
+    d.life += dt;
+    if (d.life > d.max || d.y > totalH) drops.splice(i, 1);
+  }
+}
+function drawDrops() {
+  for (const d of drops) {
+    const a = Math.max(0, 1 - d.life / d.max);
+    ctx.fillStyle = d.pink
+      ? `rgba(254, 139, 194, ${0.7 * a})`
+      : `rgba(77, 162, 255, ${0.75 * a})`;
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); 
+ctx.fill();
+  }
+}
+
+function drawBackground() {
+  ctx.fillStyle = COL.bg;
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  ctx.strokeStyle = 'rgba(77, 162, 255, 0.06)';
+  ctx.lineWidth = 1;
+  const grid = 24;
+  ctx.beginPath();
+  for (let x = 0; x < totalW; x += grid) {
+    ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, totalH);
+  }
+  for (let y = 0; y < totalH; y += grid) {
+    ctx.moveTo(0, y + 0.5); ctx.lineTo(totalW, y + 0.5);
+  }
+  ctx.stroke();
+
+  const vg = ctx.createRadialGradient(totalW/2, totalH/2, totalW * 
+0.2, totalW/2, totalH/2, totalW * 0.7);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.55)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, totalW, totalH);
+}
+
+let startTime = null, lastTime = null;
+function frame(now) {
+  if (!startTime) startTime = now;
+  if (!lastTime)  lastTime  = now;
+  const dt = Math.min(40, now - lastTime) / 16.67;
+  lastTime = now;
+  const elapsed = (now - startTime) % TOTAL;
+
+  drawBackground();
+
+  const activeTips = [];
+
+  letterPaths.forEach((letter, li) => {
+    const localT = elapsed - li * STAGGER;
+    if (localT <= 0) return;
+    const drawT = Math.min(1, localT / DRAW_PER_LETTER);
+    const eased = easeInOut(drawT);
+    let lenLeft = letter.totalLen * eased;
+
+    for (let si = 0; si < letter.subpaths.length; si++) {
+      const sp = letter.subpaths[si];
+      if (lenLeft <= 0) break;
+      const drawLen = Math.min(sp.totalLen, lenLeft);
+      const visible = buildVisible(sp, drawLen);
+      if (!visible) { lenLeft -= sp.totalLen; continue; }
+      drawPipe(visible, visible.complete);
+
+      if (!visible.complete) {
+        activeTips.push(visible.points[visible.points.length - 1]);
+      } else if (drawT < 1 && si === letter.subpaths.length - 1) {
+        activeTips.push(visible.points[visible.points.length - 1]);
+      }
+      lenLeft -= sp.totalLen;
+    }
+  });
+
+  updateDrops(dt);
+  drawDrops();
+  for (const t of activeTips) {
+    drawTip(t.x, t.y);
+    if (Math.random() < 0.3) spawnDrop(t.x, t.y);
+  }
+
+  const completionT = elapsed - (STAGGER * (WORD.length - 1) + 
+DRAW_PER_LETTER);
+  if (completionT > 0 && completionT < HOLD) {
+    const pulseT = completionT / HOLD;
+    const a = 0.14 * Math.sin(pulseT * Math.PI);
+    ctx.fillStyle = `rgba(77, 162, 255, ${a})`;
+    ctx.fillRect(0, 0, totalW, totalH);
+  }
+
+  if (elapsed > TOTAL - FADE_IN) {
+    const k = (elapsed - (TOTAL - FADE_IN)) / FADE_IN;
+    ctx.fillStyle = `rgba(3, 15, 28, ${k})`;
+    ctx.fillRect(0, 0, totalW, totalH);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
