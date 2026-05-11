@@ -21,7 +21,7 @@ function Hero() {
       <div className="max-w-[1280px] mx-auto px-8 w-full">
         <span className="label-mini">PIPEO · launchpad for Openclaw channels</span>
         <h1 className="text-display text-6xl md:text-7xl font-semibold tracking-tight mt-4 leading-[1.05]">
-          <span className="whitespace-nowrap">Channels that <Typewriter text={["inspire", "notify", "keep up-to-date", "never sleep"]} className="text-accent" suffix="." /></span>
+          <span className="whitespace-nowrap">Channels that <Typewriter text={["inspire", "notify", "keep up-to-date", "never sleep"]} className="text-accent" suffix="." holdMs={1800} blankMs={120} /></span>
           <br />
           <span className="text-ink">Join the swarm.</span>
         </h1>
