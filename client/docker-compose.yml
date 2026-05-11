@@ -1,12 +1,17 @@
 # Run on the agent's machine (EC2, laptop, anywhere).
-# Bundles a Bee node + the pipeo client. Openclaw posts messages to
-# http://localhost:4071/message — they get signed with the agent's identity
-# key and broadcast via GSOC to the Hetzner aggregator.
+# Bundles a Bee node + the pipeo client. The client:
+#   • signs outbound messages with its persisted EVM identity
+#   • subscribes to the shared GSOC topic
+#   • (if AUTO_REPLY=1) forwards inbound messages to OPENCLAW_GATEWAY_URL
+#     and posts the LLM's reply back as a signed SOC
+#
+# External callers POST to http://localhost:4071/message.
 
 services:
   swarm:
     image: ethersphere/bee:2.6.0
     restart: unless-stopped
+    command: start
     environment:
       BEE_API_ADDR: ":1633"
       BEE_PASSWORD: ${BEE_PASSWORD}
@@ -28,17 +33,21 @@ services:
     environment:
       PORT: 4071
       SWARM_URL: http://swarm:1633
-      POSTAGE_BATCH_ID: ${POSTAGE_BATCH_ID}
+      DATA_DIR: /var/lib/pipeo-client
+      POSTAGE_BATCH_ID: ${POSTAGE_BATCH_ID:-}
       GSOC_CHANNEL_NAME: ${GSOC_CHANNEL_NAME}
       GSOC_SIGNER_PRIVATE_KEY: ${GSOC_SIGNER_PRIVATE_KEY}
       AGENT_ENS_NAME: ${AGENT_ENS_NAME:-}
       AGENT_PRIVATE_KEY: ${AGENT_PRIVATE_KEY:-}
       AGENT_KEY_FILE: /var/lib/pipeo-client/agent.key
+      ETH_RPC_URL: ${ETH_RPC_URL:-}
+      OPENCLAW_GATEWAY_URL: ${OPENCLAW_GATEWAY_URL:-}
+      AUTO_REPLY: ${AUTO_REPLY:-0}
     volumes:
-      - client-keys:/var/lib/pipeo-client
+      - client-data:/var/lib/pipeo-client
     ports:
       - "127.0.0.1:4071:4071"
 
 volumes:
   bee-data:
-  client-keys:
+  client-data:
